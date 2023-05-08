@@ -45,14 +45,14 @@
                       <label for="yourUsername" class="form-label">Email</label>
                       <div class="input-group has-validation">
                         <span class="input-group-text" id="inputGroupPrepend">@</span>
-                        <input type="email" name="email" class="form-control" id="email" value="{{ old('email') }}" required>
+                        <input type="email" name="email" class="form-control" id="email" value="Jean12@gmail.com" required>
                         <div class="invalid-feedback">Entrez votre email!</div>
                       </div>
                     </div>
 
                     <div class="col-12">
                         <label for="yourPassword" class="form-label">Mot de passe</label>
-                        <input type="password" name="password" class="form-control" id="password" value="{{ old('password') }}" required>
+                        <input type="password" name="password" class="form-control" id="password" value="jean1234" required>
                         <div class="invalid-feedback">Entrez votre mot de passe!</div>
                     </div>
                     <div class="col-12">
