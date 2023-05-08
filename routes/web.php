@@ -13,7 +13,11 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::get('/', \App\Http\Controllers\ArticleController::class . '@index')->name('index');
+Route::get('/', \App\Http\Controllers\UtilisateurController::class . '@index')->name('index');
+
+Route::get('/mainpage',[\App\Http\Controllers\UtilisateurController::class, 'accueil'])->name('utilisateur.accueilutilisateur');
+
+Route::get('/detailsarticle=ART/{id}article',[\App\Http\Controllers\ArticleController::class, 'details'])->name('article.detailsarticle');
 
 // Fonction get generalisee
 Route::get('/{controller}/{method}/{param?}', function ($controller, $method, $param = null) {
@@ -31,3 +35,4 @@ Route::post('/{controller}/{method}', function ($controller, $method, Request $r
     $controller = app()->make("App\\Http\\Controllers\\{$controller}Controller");
     return $controller->$method($request);
 });
+

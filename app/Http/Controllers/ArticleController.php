@@ -1,75 +1,99 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Http\Request;
 use App\Models\Article;
-use App\Models\listearticle;
-use App\Models\Categorie;
+use App\Models\Publication;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Cache;
 
 class ArticleController extends Controller
 {
-    public function index() {
-        $articles = listearticle::simplePaginate(3);
+    // recherche de la liste d'article
+    public function recherchearticle(Request $request) {
 
-        return view('index',[
-            'articles' => $articles ,
-            'link' => $articles->links() 
-               ]);
+        $query =Article::query();
+        if ($request->has('categorie')) {
+            $query->where('categorie', 'like', '%' . $request->input('categorie') . '%'); }
+        if ($request->has('contenu')) {
+            $query->where('contenu', 'like', '%' . $request->input('contenu') . '%'); }
+        if ($request->has('titre')) {
+            $query->where('titre', 'like', '%' . $request->input('titre') . '%'); }
+
+        $recherchearticle = $query->simplePaginate(3);
+        //  dd($recherchearticle);
+        return redirect()->back()->with('recherchearticle', $recherchearticle);
     }
 
-    public function getarticle($id) {
-        $article = Cache::remember('article_' . $id, 60, function () use ($id) {
-            return Article::find($id);
-        });
-    
-        return view('Details', compact('article'));
-    }
-    public function newArticle(Request $request) {
-        Article::create($request->all());    
-        return redirect()->back()->with('success', 'L\'entrée a été enregistree avec succès.');
+    // Ajouter
+    public function ajoutcontenu(Request $request)
+        {
+            if ($request->hasFile('image') && $request->file('image')->isValid()) {
+                $filename = $request->file('image')->getClientOriginalName();
+                $path = $request->file('image')->storeAs('public/assets/img',$filename);
+            }
+
+        $Article=Article::create(
+            [
+                'categorie'=>$request->input('categorie'),
+                'titre'=>$request->input('titre'),
+                'resume'=>$request->input('resume'),
+                'contenu'=>$request->input('contenu'),
+                'idauteur'=>$request->input('idauteur'),
+                'image'=>$request->file('image')->getClientOriginalName()
+            ]
+        );
+
+        DB::table('publication')->insert([
+            'idarticle' =>$Article->id,
+        ]);
+
+        return redirect()->route('accueilauteur')->with('success','Informations enregistrees');
+     }
+
+    // Modifier
+    public function getmodif($id)
+    {
+        $Article=Article::find($id);
+
+        return view('modif',['Article'=>$Article]);
     }
 
-    // Vers ajout articles
-    public function redirectnewArticle() {
-        $categorie = Categorie::all();
-        return view('ajoutarticle',compact('categorie'));
-        }  
-        
-    // Vers modif articles
-    public function redirecteditArticle($id) {
-        $article = Article::find($id);
-        return view('modifierarticle',['article' => $article]);
-        } 
-        
-    //  modif articles
-        public function editarticle(Request  $request) {
-            $article = Article::find(request('id')); // Trouver l'entrée dans la base de données
-            $article->update($request->all());
-            return redirect()->back()->with('success', 'L\'entrée a été mise à jour avec succès.');
-        
-        }   
+    public function modifierarticle(Request $request)
+    {
+        if ($request->hasFile('image') && $request->file('image')->isValid()) {
+            $filename = $request->file('image')->getClientOriginalName();
+            $path = $request->file('image')->storeAs('public/assets/img',$filename);
+        }
 
-    
-    //  modif articles
-        public function recherche(Request  $request) {
-            $query = DB::table('listearticle');
-            if ($request->has('titre')) {
-                $query->where('titre', 'like', '%' . $request->input('titre') . '%');
-            }
-            if ($request->has('resume')) {
-                $query->where('resume', 'like', '%' . $request->input('resume') . '%');
-            }
-            // ajouter une condition pour le champ "age" si le critère de recherche est fourni
-            if ($request->has('contenu')) {
-                $query->where('contenu','like', '%' . $request->input('contenu') . '%');
-            }
-            // exécuter la requête et récupérer les enregistrements correspondants
-            $articles = $query->get();
-            return view('resultat',['articles' => $articles]);   
-            }   
-    
+        $Article=Article::where('id',$request->input('idarticle'))->update(['titre'=>$request->input('titre'),
+        'resume'=>$request->input('resume'),
+        'categorie'=>$request->input('categorie'),
+        'contenu'=>$request->input('contenu'),
+        'image'=>$request->file('image')->getClientOriginalName()
+        ]);
+
+        $Publication=Publication::where('idarticle',$request->input('idarticle'))->update(['update_at'=>DB::raw('CURRENT_TIMESTAMP')]);
+        return redirect()->back()->with('success','Informations enregistrees');
+
+    }
+
+    // Publier
+    public function publier($id)
+    {
+        Publication::where('idarticle',$id)->update(['etat'=>2]);
+        return redirect()->back()->with('success','Article publie');
+    }
+
+    // Details
+    public function details($id){
+        $Article=Article::find($id);
+        return view('details',['Article'=>$Article]);
+    }
+
+
+
+
 
 
 }
