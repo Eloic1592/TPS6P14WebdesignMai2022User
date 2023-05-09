@@ -64,7 +64,7 @@
                                 <div class="card-body">
                                 <h5 class="card-title">{{ $liste_article->titre }}</h5>
                                 <p class="card-text">{{ $liste_article->resume }}</p>
-                                {!! $liste_article->Publier !!}
+                                {!! $liste_article->DatePublic !!}
                                 {!! $liste_article->Details !!}
                             </div>
                         </div>
@@ -87,7 +87,7 @@
                                 <div class="card-body">
                                 <h5 class="card-title">{{ $liste_article->titre }}</h5>
                                 <p class="card-text">{{ $liste_article->resume }}</p>
-                                {!! $liste_article->Publier !!}
+                                {!! $liste_article->DatePublic !!}
                                 {!! $liste_article->Details !!}
                             </div>
                         </div>
