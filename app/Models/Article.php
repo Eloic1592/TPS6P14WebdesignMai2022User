@@ -20,7 +20,7 @@ class Article extends Model
     public function getPhotoAttribute(){
         if($this->attributes['image']){
             $asset = route('storage', ['filename' => $this->attributes['image']]);
-            return  "<img src='https://tps6p14webdesignmai2022admin-production.up.railway.app/".$asset."' class='card-img-top'>";
+            return  "<img src='".$asset."' class='card-img-top'>";
         }
 
 
