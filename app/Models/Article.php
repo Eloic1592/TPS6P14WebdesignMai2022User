@@ -48,4 +48,9 @@ class Article extends Model
         return '<span class="badge bg-danger">Deja publie</span>';
     }
 
+    public function getDatepublicAttribute(){
+        $Publication=Publication::where('idarticle', $this->attributes['id'])->first();
+        return " <p><span class='badge bg-light text-dark'>Publie le ".$Publication->created_at."</span></p>";
+        }
+
 }
