@@ -19,15 +19,22 @@ Route::get('/mainpage',[\App\Http\Controllers\UtilisateurController::class, 'acc
 
 Route::get('/detailsarticle=ART/{id}article',[\App\Http\Controllers\ArticleController::class, 'details'])->name('article.detailsarticle');
 
-// Fonction get generalisee
-Route::get('/{controller}/{method}/{param?}', function ($controller, $method, $param = null) {
-    $controller = app()->make("App\\Http\\Controllers\\{$controller}Controller");
-    if ($param) {
-        return $controller->$method($param);
-    } else {
-        return $controller->$method();
+Route::get('/storage/{filename}', function ($filename)
+{
+    $path = storage_path('app/public/assets/img/' . $filename);
+
+    if (!File::exists($path)) {
+        abort(404);
     }
-})->where('param', '(.*)');
+
+    $file = File::get($path);
+    $type = File::mimeType($path);
+
+    $response = Response::make($file, 200);
+    $response->header("Content-Type", $type);
+
+    return $response;
+})->name('storage');
 
 
 // Fonction post generalisee
